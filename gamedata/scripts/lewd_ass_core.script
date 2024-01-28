@@ -1,0 +1,52 @@
+---==================================================================================================================---
+---                                                                                                                  ---
+---    Original Author(s) : NLTP_ASHES                                                                               ---
+---    Edited : N/A                                                                                                  ---
+---    Date : 28/01/2024                                                                                             ---
+---    License : Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)           ---
+---                                                                                                                  ---
+---    Script used to handle the core logic of the addon.                                                            ---
+---                                                                                                                  ---
+---==================================================================================================================---
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Constants, global variables and imported functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Attach functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+function attach_scope(item, weapon)
+end
+
+function attach_silencer(item, weapon)
+end
+
+function attach_grenade_launcher(item, weapon)
+end
+
+function attach_grip(item, weapon)
+end
+
+function attach_laser(item, weapon)
+end
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Detach functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+function detach_scope(weapon)
+end
+
+function detach_silencer(weapon)
+end
+
+function detach_grenade_launcher(weapon)
+end
+
+function detach_grip(weapon)
+end
+
+function detach_laser(weapon)
+end

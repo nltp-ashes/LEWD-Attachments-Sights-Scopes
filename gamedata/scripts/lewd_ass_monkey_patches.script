@@ -1,0 +1,30 @@
+---==================================================================================================================---
+---                                                                                                                  ---
+---    Original Author(s) : NLTP_ASHES                                                                               ---
+---    Edited : N/A                                                                                                  ---
+---    Date : 28/01/2024                                                                                             ---
+---    License : Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)           ---
+---                                                                                                                  ---
+---    Script used to monkey-patch functions from vanilla Anomaly, or addons, to enable LEWD ASS to work properly.   ---
+---                                                                                                                  ---
+---==================================================================================================================---
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Monkey-patched functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+item_weapon_attach_scope = item_weapon.attach_scope
+function item_weapon.attach_scope(item, weapon)
+    if lewd_ass_utils.uses_lewd_ass(weapon) then
+        return lewd_ass_core.attach_scope(item, weapon)
+    end
+    return item_weapon_attach_scope(item, weapon)
+end
+
+item_weapon_detach_scope = item_weapon.detach_scope
+function item_weapon.detach_scope(weapon)
+    if lewd_ass_utils.uses_lewd_ass(weapon) then
+        return lewd_ass_core.detach_scope(weapon)
+    end
+    return item_weapon_detach_scope(weapon)
+end

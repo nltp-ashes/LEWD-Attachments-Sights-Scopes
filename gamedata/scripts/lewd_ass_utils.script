@@ -1,0 +1,134 @@
+---==================================================================================================================---
+---                                                                                                                  ---
+---    Original Author(s) : NLTP_ASHES                                                                               ---
+---    Edited : N/A                                                                                                  ---
+---    Date : 28/01/2024                                                                                             ---
+---    License : Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)           ---
+---                                                                                                                  ---
+---    Script used to define utility functions that are used at numerous points in the addon's codebase.             ---
+---                                                                                                                  ---
+---==================================================================================================================---
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Constants, global variables and imported functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+debug_mode                   = true
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- General utility functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+function uses_lewd_ass(obj)
+    if not validate_params({obj,"uses_lewd_ass"}) then return end
+
+    return ini_sys:r_bool_ex(obj:section(), "uses_lewd_ass", false)
+end
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Debug Functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+--- Function used to print information into the console/log file only when Western Goods' debug mode is enabled.
+--- @return nil
+function dbg_printf(...)
+    if debug_mode then
+        printf(...)
+    end
+end
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Bone functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+--- Function used to get the position of a bone by its name.
+--- This function should be used in case the bone is from a world model.
+--- @author Thial
+--- @param obj game_object
+--- @param bone string
+--- @return vector
+function bone_position(obj, bone)
+    if not validate_params({obj,bone,"bone_position"}) then return end
+
+    return obj:bone_position(obj:get_bone_id(bone, false), false)
+end
+
+--- Function used to get the position of a bone by its name.
+--- This function should be used in case the bone is from a hud model.
+--- @param obj game_object
+--- @param hud_bone string
+--- @param bone string
+--- @return vector
+function bone_hud_position(obj, hud_bone, bone)
+    if not validate_params({obj,hud_bone,bone,"bone_hud_position"}) then return end
+
+    -- Cant find hud bone in TPS, use default bone
+    if level.get_active_cam() ~= 0 then
+        printf("~[LEWD ASS] WARNING | Utils | Trying to get HUD bone '%s' position in third person ! Fallback to '%s'", hud_bone, bone)
+        return this.bone_position(obj, bone)
+    end
+
+    return obj:bone_position(obj:get_bone_id(hud_bone, true), true)
+end
+
+--- Function used to set the visibility a bone off a game object.
+--- This function can be used as a getter or as a setter.
+--- This function should be used in case the bone is from a world model.
+--- @param obj game_object
+--- @param bone string
+--- @param visibility boolean
+--- @return nil
+function bone_visibility(obj, bone, visibility)
+    if not validate_params({obj,bone,"bone_visibility"}) then return end
+
+    if visibility == nil then
+        return obj:bone_visible(bone, false)
+    end
+
+    obj:set_bone_visible(bone, visibility, true, false)
+end
+
+--- Function used to set the visibility a bone off a game object.
+--- This function can be used as a getter or as a setter.
+--- This function should be used in case the bone is from a hud model.
+--- @param obj game_object
+--- @param hud_bone string
+--- @param bone string
+--- @param visibility boolean
+--- @return nil
+function bone_hud_visibility(obj, hud_bone, bone, visibility)
+    if not validate_params({obj,hud_bone,bone,"bone_hud_visibility"}) then return end
+
+    -- Cant find hud bone in TPS, use default bone
+    if level.get_active_cam() ~= 0 then
+        printf("~[LEWD ASS] WARNING | Utils | Trying to set HUD bone '%s' visibility in third person ! Fallback to '%s'", hud_bone, bone)
+        return this.bone_visibility(obj, bone, visibility)
+    end
+
+    if visibility == nil then
+        return obj:bone_visible(hud_bone, true)
+    end
+
+    obj:set_bone_visible(hud_bone, visibility, true, true)
+end
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Validation functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+--- Function used to check if all necessary parameters were correctly passed to a function.
+--- Last element of the table has to be the name of the function calling validate_params.
+--- Use like this : 'if not validate_params({param_1,param_1,"my_function"}) then return end'
+--- @param params table
+--- @return boolean
+function validate_params(params)
+    local index = 1
+    for i,_ in pairs(params) do
+        if i ~= index then
+            printf("![LEWD ASS] ERROR | Utils | Missing argument no %s for '%s()'!",index,params[#params])
+            return false
+        end
+        index = index + 1
+    end
+    return true
+end
