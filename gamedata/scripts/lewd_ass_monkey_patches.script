@@ -2,7 +2,7 @@
 ---                                                                                                                  ---
 ---    Original Author(s) : NLTP_ASHES                                                                               ---
 ---    Edited : N/A                                                                                                  ---
----    Date : 28/01/2024                                                                                             ---
+---    Date : 29/01/2024                                                                                             ---
 ---    License : Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)           ---
 ---                                                                                                                  ---
 ---    Script used to monkey-patch functions from vanilla Anomaly, or addons, to enable LEWD ASS to work properly.   ---
@@ -16,15 +16,19 @@
 item_weapon_attach_scope = item_weapon.attach_scope
 function item_weapon.attach_scope(item, weapon)
     if lewd_ass_utils.uses_lewd_ass(weapon) then
+        lewd_ass_utils.dbg_printf("lewd_ass_monkey_patches.attach_scope with LEWD ASS")
         return lewd_ass_core.attach_scope(item, weapon)
     end
+    lewd_ass_utils.dbg_printf("lewd_ass_monkey_patches.attach_scope vanilla")
     return item_weapon_attach_scope(item, weapon)
 end
 
 item_weapon_detach_scope = item_weapon.detach_scope
 function item_weapon.detach_scope(weapon)
     if lewd_ass_utils.uses_lewd_ass(weapon) then
+        lewd_ass_utils.dbg_printf("lewd_ass_monkey_patches.detach_scope with LEWD ASS")
         return lewd_ass_core.detach_scope(weapon)
     end
+    lewd_ass_utils.dbg_printf("lewd_ass_monkey_patches.detach_scope vanilla")
     return item_weapon_detach_scope(weapon)
 end

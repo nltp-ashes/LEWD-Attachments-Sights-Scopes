@@ -2,7 +2,7 @@
 ---                                                                                                                  ---
 ---    Original Author(s) : NLTP_ASHES                                                                               ---
 ---    Edited : N/A                                                                                                  ---
----    Date : 28/01/2024                                                                                             ---
+---    Date : 29/01/2024                                                                                             ---
 ---    License : Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)           ---
 ---                                                                                                                  ---
 ---    Script used to define utility functions that are used at numerous points in the addon's codebase.             ---
@@ -16,17 +16,41 @@
 debug_mode                   = true
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- General utility functions
+-- LEWD ASS specific utility functions
 -- ---------------------------------------------------------------------------------------------------------------------
 
 function uses_lewd_ass(obj)
     if not validate_params({obj,"uses_lewd_ass"}) then return end
-
-    return ini_sys:r_bool_ex(obj:section(), "uses_lewd_ass", false)
+    return IsWeapon(obj) and ini_sys:r_bool_ex(obj:section(), "lewd_ass_enabled", false)
 end
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- Debug Functions
+-- Scope functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+function get_scopes(section)
+    if not validate_params({section,"get_lewd_ass_scopes"}) then return end
+    return parse_list(ini_sys, section, "lewd_ass_scopes")
+end
+
+function has_scope(scopes, scope)
+    return this.table_contains(scopes, scope)
+end
+
+function set_all_scopes_visibility(weapon, scope_sections, visibility)
+    for _,section in pairs(scope_sections) do
+        this.set_scope_visibility(weapon, section, visibility)
+    end
+end
+
+function set_scope_visibility(weapon, scope_section, visibility)
+    local bone_name = "ass_scope_" .. scope_section
+    dbg_printf("bone_name %s %s", bone_name, visibility)
+    this.bone_hud_visibility(weapon, bone_name, "wpn_body", visibility)
+end
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Debug function
 -- ---------------------------------------------------------------------------------------------------------------------
 
 --- Function used to print information into the console/log file only when Western Goods' debug mode is enabled.
@@ -35,6 +59,54 @@ function dbg_printf(...)
     if debug_mode then
         printf(...)
     end
+end
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+--- Function used to know if a certain value is contained in a table. This function is generic enough so that it'd work on any table.
+--- @param tab table
+--- @param val any
+--- @return boolean
+function table_contains(tab, val)
+    if not validate_params({tab,val,"table_contains"}) then return end
+    for _,value in pairs(tab) do
+        if val == value then
+            return true
+        end
+    end
+    return false
+end
+
+--- Function used to get a random id (as an int) from a given table.
+--- Returns a random number between 1 and the size of the table.
+--- @param tab table
+--- @return number
+function table_random_id(tab)
+    if not validate_params({tab,"table_random_id"}) then return end
+    return math.random(1,#tab)
+end
+
+--- Function used to get a random key from a key-value table.
+--- @param tab table
+--- @return any
+function table_random_key(tab)
+    if not validate_params({tab,"table_random_key"}) then return end
+    local n = {}
+    for k,v in pairs(tab) do
+        n[#n+1] = k
+    end
+    return #n > 0 and n[math.random(#n)] or nil
+end
+
+--- Function used to know if an element of a table has a next.
+--- @param tab table
+--- @param pos number
+--- @return boolean
+function has_next(tab, pos)
+    if not validate_params({tab,pos,"has_next"}) then return end
+    return next(tab,pos) ~= nil
 end
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -131,4 +203,23 @@ function validate_params(params)
         index = index + 1
     end
     return true
+end
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Other Utils Functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+--- Function used to find an NPC by its section name in the player squad.
+--- @author mr_demonized
+--- @param func function
+--- @param ... table
+--- @return nil
+function next_tick(func, ...)
+    if not validate_params({func,"next_tick"}) then return end
+
+    local args = {...}
+    AddUniqueCall(function()
+        func(unpack(args))
+        return true
+    end)
 end

@@ -2,7 +2,7 @@
 ---                                                                                                                  ---
 ---    Original Author(s) : NLTP_ASHES                                                                               ---
 ---    Edited : N/A                                                                                                  ---
----    Date : 28/01/2024                                                                                             ---
+---    Date : 29/01/2024                                                                                             ---
 ---    License : Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)           ---
 ---                                                                                                                  ---
 ---    Script used to handle the core logic of the addon.                                                            ---
@@ -13,23 +13,91 @@
 -- Constants, global variables and imported functions
 -- ---------------------------------------------------------------------------------------------------------------------
 
+weapons                      = {}
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Core functions
+-- ---------------------------------------------------------------------------------------------------------------------
+
+function game_object_on_net_spawn(obj)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.game_object_on_net_spawn")
+
+    -- Return on non-weapon objects or non-LEWD-ASS weapons
+    if not lewd_ass_utils.uses_lewd_ass(obj) then
+        return
+    end
+
+    lewd_ass_utils.dbg_printf("lewd_ass_core.game_object_on_net_spawn with LEWD ASS weapon")
+
+    -- Create entry for this weapon if needed
+    if not weapons[obj:id()] then
+        weapons[obj:id()] = {}
+    end
+
+    -- Hide all scopes
+    CreateTimeEvent("lewd_ass", "initialize_weapon", 0.1, function(id)
+        local weapon = level.object_by_id(id)
+        if not weapon then
+            printf("![LEWD ASS] ERROR | Core | Could not initialize weapon, no object found with ID '%s'", id)
+            return
+        end
+        local scopes = lewd_ass_utils.get_scopes(weapon:section())
+        lewd_ass_utils.set_all_scopes_visibility(weapon, scopes, false)
+        return true
+    end, obj:id())
+
+    -- Show attached scope (if any)
+    local attached_scope_section = weapons[obj:id()].scope
+    if attached_scope_section then
+        lewd_ass_utils.dbg_printf("lewd_ass_core.game_object_on_net_spawn scope %s", attached_scope_section)
+        lewd_ass_utils.set_scope_visibility(obj, attached_scope_section, true)
+    end
+end
+
+function game_object_on_net_destroy(obj)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.game_object_on_net_destroy")
+end
+
 -- ---------------------------------------------------------------------------------------------------------------------
 -- Attach functions
 -- ---------------------------------------------------------------------------------------------------------------------
 
 function attach_scope(item, weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.attach_scope")
+
+    -- Get list of compatible scopes
+    local scopes = lewd_ass_utils.get_scopes(weapon:section())
+
+    -- Prevent incompatible scopes from being mounted
+    if not lewd_ass_utils.has_scope(scopes, item:section()) then
+        return
+    end
+
+    -- Hide all scopes
+    lewd_ass_utils.set_all_scopes_visibility(weapon, scopes, false)
+
+    -- Show attached scope
+    lewd_ass_utils.set_scope_visibility(weapon, item:section(), true)
+
+    weapons[weapon:id()] = {
+        scope = item:section()
+    }
 end
 
 function attach_silencer(item, weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.attach_silencer")
 end
 
 function attach_grenade_launcher(item, weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.attach_grenade_launcher")
 end
 
 function attach_grip(item, weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.attach_grip")
 end
 
 function attach_laser(item, weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.attach_laser")
 end
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -37,16 +105,27 @@ end
 -- ---------------------------------------------------------------------------------------------------------------------
 
 function detach_scope(weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.detach_scope")
 end
 
 function detach_silencer(weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.detach_silencer")
 end
 
 function detach_grenade_launcher(weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.detach_grenade_launcher")
 end
 
 function detach_grip(weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.detach_grip")
 end
 
 function detach_laser(weapon)
+    lewd_ass_utils.dbg_printf("lewd_ass_core.detach_laser")
+end
+
+
+function on_game_start()
+    RegisterScriptCallback("game_object_on_net_spawn", game_object_on_net_spawn)
+    RegisterScriptCallback("game_object_on_net_destroy", game_object_on_net_destroy)
 end
